@@ -18,6 +18,10 @@ function errorHandler(err, req, res, next) {
 
     if (err.name.toUpperCase().includes('SEQUELIZE')) {
         payload.message = err.stack.substring(err.stack.indexOf(':') + 2, err.stack.indexOf('\n'));
+
+        if (err.original.sqlMessage){
+            payload.message = payload.message + '. ' + err.original.sqlMessage;
+        }
     }
     if (err.statusCode && err.statusCode >= 400 && err.statusCode <= 499) {
         statusCode = err.statusCode;
