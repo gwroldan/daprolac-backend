@@ -1,5 +1,15 @@
 const Sequilize = require('sequelize');
+const bcrypt = require('bcrypt');
+
 const db = require('../config/mysql');
+const response = require('../utils/response');
+
+async function getPasswordHash(usuario) {
+    const saltos = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(usuario.clave, saltos);
+
+    return hash;
+}
 
 const usuario = db.define('usuario', {
     id: {
@@ -30,6 +40,29 @@ const usuario = db.define('usuario', {
         type: Sequilize.INTEGER,
         defaultValue: 0
     }
-})
+}, {
+    hooks: {
+        async beforeCreate(usuario) {
+            try {
+                usuario.clave = await getPasswordHash(usuario);
+            } catch (err) {
+                throw response.customError('Error encriptando clave de usuario. ' + err.message(), 500);
+            }
+        },
+        async beforeUpdate(usuario) {
+            try {
+                const cmp = await bcrypt.compare(usuario.clave, usuario._previousDataValues.clave);
+
+                if (!cmp && usuario._previousDataValues.clave != usuario.dataValues.clave) {
+                    usuario.clave = await getPasswordHash(usuario);
+                } else {
+                    usuario.clave = usuario._previousDataValues.clave;
+                }
+            } catch (err) {
+                throw response.customError('Error encriptando clave de usuario. ' + err.message(), 500);
+            }
+        }
+    }
+});
 
 module.exports = usuario;

@@ -8,7 +8,6 @@ exports.obtener = async (req, res, next, model) => {
 
     let options = {};
     if (eager && eager == true && (!utils.isEmpty(model.associations))) {
-        //options.include = Object.keys(model.associations).toString();
         options.include = [{ all: true, nested: true }];
     }
     if (req.params && req.params.id) {
@@ -42,8 +41,12 @@ exports.actualizar = async (req, res, next, model, objAsoc = {}, cbkAsoc = undef
     const trans = await db.transaction();
 
     try {
-        await model.update(req.body, { where: {id: req.params.id}, transaction: trans });
-        if (!utils.isEmpty(objAsoc)) { await cbkAsoc(objAsoc, req.params.id, trans) }
+        const resultado = await model.findOne({ where: {id: req.params.id}, transaction: trans });
+
+        if (resultado) {
+            await resultado.update(req.body, { transaction: trans });
+            if (!utils.isEmpty(objAsoc)) { await cbkAsoc(objAsoc, req.params.id, trans) }
+        }
 
         await trans.commit();
         response.success(req, res,200, {id: req.params.id});
