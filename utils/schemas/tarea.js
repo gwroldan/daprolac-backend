@@ -8,7 +8,7 @@ const tareaAntecesoraSchema = joi.object().keys({
 });
 
 const nombreTareaSchema = joi.string().trim().max(100);
-const observacionesTareaSchema = joi.string().trim().max(255);
+const observacionesTareaSchema = joi.string().max(255).allow('');
 const procesoTareaSchema = {
     idProceso: joi.number().required(),
     tareaAntecesora: tareaAntecesoraSchema
