@@ -3,6 +3,9 @@ const routes = require('./routes');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
 // Middlewares
 const { logErrors, wrapErrors, errorHandler } = require('./utils/middlewares/error-handler');
 const notFoundHandler = require('./utils/middlewares/not-found-handler');
@@ -22,8 +25,11 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: false})); // Datos de formularios
 app.use(bodyParser.json()); // formato json
 
-//habilitar cors
+// habilitar cors
 app.use(cors());
+
+// documentacion
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // rutas de la API
 app.use('/api/v1', routes());
