@@ -10,7 +10,7 @@ const unidadMedidaDatoSchema = joi.string().trim().max(40);
 const tipoDatoSchema = joi.string().trim().valid('numero', 'cadena', 'opcion');
 const minMaxDatoSchema = joi.number().min(0);
 const valorOpcionDatoSchema = joi.object().keys({
-    valor: joi.string().trim().max(100).required(),
+    valor: joi.string().trim().max(100),
     id: joi.number()
 });
 const valoresOpcionDatoSchema = joi.array().items(valorOpcionDatoSchema);
