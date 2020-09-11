@@ -1,7 +1,24 @@
+const bcrypt = require('bcrypt');
 const db = require('../config/mysql');
 
 const response = require('../utils/response');
 const utils = require('../utils/utils');
+
+exports.login = async (req, res, next, model) => {
+  const { email, clave } = req.body;
+  let auth = false;
+
+  try {
+    const resultado = await model.findOne({ where: { email } });
+    if (resultado) {
+      auth = await bcrypt.compare(clave, resultado.clave);
+    }
+
+    response.success(req, res, 200, { auth });
+  } catch (err) {
+    next(err);
+  }
+}
 
 exports.obtener = async (req, res, next, model) => {
     const { eager } = req.query;

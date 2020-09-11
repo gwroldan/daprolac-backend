@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // importo los schemas
-const { crearUsuarioSchema, actualizarUsuarioSchema } = require('../utils/schemas/usuario');
+const { crearUsuarioSchema, actualizarUsuarioSchema, loginUsuarioSchema } = require('../utils/schemas/usuario');
 const { crearProcesoSchema, actualizarProcesoSchema } = require('../utils/schemas/proceso');
 const { crearTareaSchema, actualizarTareaSchema } = require('../utils/schemas/tarea');
 const { crearDatoSchema, actualizarDatoSchema } = require('../utils/schemas/dato');
@@ -18,6 +18,7 @@ module.exports = () => {
     router.get('/usuarios', usuariosController.obtenerUsuarios);
     router.get('/usuarios/:id', usuariosController.obtenerUsuarios);
     router.post('/usuarios', validationHandler(crearUsuarioSchema), usuariosController.crearUsuario);
+    router.post('/usuarios/login', validationHandler(loginUsuarioSchema), usuariosController.loginUsuario);
     router.put('/usuarios/:id', validationHandler(actualizarUsuarioSchema), usuariosController.actualizarUsuario);
     router.delete('/usuarios/:id', usuariosController.eliminarUsuario);
 

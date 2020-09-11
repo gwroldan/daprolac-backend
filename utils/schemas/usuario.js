@@ -22,7 +22,13 @@ const actualizarUsuarioSchema = {
     tipo: tipoUsuarioSchema
 }
 
+const loginUsuarioSchema = {
+    email: emailUsuarioSchema.required(),
+    clave: claveUsuarioSchema.required()
+}
+
 module.exports = {
     crearUsuarioSchema,
-    actualizarUsuarioSchema
+    actualizarUsuarioSchema,
+    loginUsuarioSchema
 }
