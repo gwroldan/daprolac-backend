@@ -10,20 +10,21 @@ const utils = require('../utils/utils');
 const response = require('../utils/response');
 
 function getProcesoAsoc(req) {
-  let fechaInicia = Date.now();
-  if (req.body.fechaInicia) {
-    const fecha = new Date(req.body.fechaInicia);
-    fechaInicia = fecha.getTime();
+  let fechaIniciaProp = Date.now();
+  if (req.body.fechaIniciaProp) {
+    const fecha = new Date(req.body.fechaIniciaProp);
+    fechaIniciaProp = fecha.getTime();
   }
 
   return {
     idProceso: req.body.idProceso,
-    fechaInicia: fechaInicia,
-    numero: req.body.numero ? req.body.numero : 0
+    fechaIniciaProp: fechaIniciaProp,
+    numero: req.body.numero ? req.body.numero : 0,
+    tareas: req.body.tareas ? req.body.tareas : []
   };
 }
 
-async function setTareasOrden(objAsoc, idOrden, trans) {
+async function createTareasOrden(objAsoc, idOrden, trans) {
   // Obtengo el proceso que me llego en la consulta
   const objProceso = await proceso
       .findOne({
@@ -37,14 +38,15 @@ async function setTareasOrden(objAsoc, idOrden, trans) {
     throw response.customError('El proceso seleccionado no cuenta con tareas asociadas.', 409);
   }
 
-  let fechaInicia = DateTime.fromMillis(objAsoc.fechaInicia);
-  const tareasSort = utils.sortTareas(objProceso.tareas);
-
   const tareasOrden = [];
   const datosOrden = [];
+
+  let fechaIniciaProp = DateTime.fromMillis(objAsoc.fechaIniciaProp);
+  const tareasSort = utils.sortTareas(objProceso.tareas);
+
   tareasSort.forEach( tarea => {
     if (tarea.proceso_tarea.idTareaAntecesora) {
-      fechaInicia = fechaInicia
+      fechaIniciaProp = fechaIniciaProp
           .plus({
             days: tarea.proceso_tarea.diasAntecesora,
             hours: tarea.proceso_tarea.horasAntecesora,
@@ -55,7 +57,7 @@ async function setTareasOrden(objAsoc, idOrden, trans) {
     tareasOrden.push({
       idOrden: idOrden,
       idTarea: tarea.id,
-      fechaIniciaProp: fechaInicia.toJSDate()
+      fechaIniciaProp: fechaIniciaProp.toJSDate()
     });
 
     tarea.datos.forEach( dato => {
@@ -71,6 +73,54 @@ async function setTareasOrden(objAsoc, idOrden, trans) {
   await ordenDato.bulkCreate(datosOrden, { transaction: trans, validate: true });
 }
 
+async function updateTareasOrden(objAsoc, idOrden, trans) {
+  const tareasOrden = [];
+  const datosOrden = [];
+  const camposActualiza = []
+
+  objAsoc.tareas.forEach( tarea => {
+    const t = {
+      idOrden: idOrden,
+      idTarea: tarea.idTarea,
+    };
+    if (tarea.fechaInicia) {
+      const fechaI = new Date(tarea.fechaInicia);
+      t.fechaInicia = fechaI.getTime();
+      camposActualiza.push('fechaInicia');
+    }
+    if (tarea.fechaFin) {
+      const fechaF = new Date(tarea.fechaFin);
+      t.fechaFin = fechaF.getTime();
+      camposActualiza.push('fechaFin');
+    }
+    if (tarea.idUsuario) {
+      t.idUsuario = tarea.idUsuario;
+      camposActualiza.push('idUsuario');
+    }
+    tareasOrden.push(t);
+
+    if (tarea.datos) {
+      tarea.datos.forEach(dato => {
+        datosOrden.push({
+          idOrden: idOrden,
+          idTarea: tarea.idTarea,
+          idDato: dato.idDato,
+          valor: dato.valor
+        });
+      });
+    }
+  });
+
+  await ordenTarea.bulkCreate(tareasOrden, {
+        transaction: trans,
+        updateOnDuplicate: camposActualiza
+      });
+  await ordenDato.bulkCreate(datosOrden, {
+        transaction: trans,
+        updateOnDuplicate: ['valor']
+      });
+}
+
 exports.setOrdenNumero = async (req, res, next) => {
   if (!req.body.numero || (req.body.numero && req.body.numero === 0)) {
     const resultado = await orden.max('numero');
@@ -84,7 +134,10 @@ exports.obtenerOrdenes = async (req, res, next) => { control.obtener(req, res, n
 
 exports.crearOrden = async (req, res, next) => {
   const procesoAsoc = getProcesoAsoc(req);
-  control.crear(req, res, next, orden, procesoAsoc, setTareasOrden);
+  control.crear(req, res, next, orden, procesoAsoc, createTareasOrden);
 }
-exports.actualizarOrden = async (req, res, next) => { control.actualizar(req, res, next, orden); }
+exports.actualizarOrden = async (req, res, next) => {
+  const procesoAsoc = getProcesoAsoc(req);
+  control.actualizar(req, res, next, orden, procesoAsoc, updateTareasOrden);
+}
 exports.eliminarOrden = async (req, res, next) => { control.eliminar(req, res, next, orden); }

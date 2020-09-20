@@ -6,20 +6,20 @@ const joi = joiBase.extend(joiDate);
 const numeroOrdenSchema = joi.number().min(0);
 const finalizadaOrdenSchema = joi.boolean();
 const idProcesoOrdenSchema = joi.number();
-const fechaIniciaOrdenSchema = joi.date();
+const fechaOrdenSchema = joi.date();
 
 const tareaDatoSchema = {
   idDato: joi.number().required(),
-  valor: joi.string(),
+  valor: joi.string().required(),
 };
 const tareaDatosSchema = joi.array().items(tareaDatoSchema);
 
 const ordenTareaSchema = {
+  idTarea: joi.number().required(),
   idUsuario: joi.number(),
-  fechaIniciaProp: joi.date(),
-  fechaInicia: joi.date(),
-  fechaFin: joi.date(),
-  tareaDatos: tareaDatosSchema
+  fechaInicia: fechaOrdenSchema,
+  fechaFin: fechaOrdenSchema,
+  datos: tareaDatosSchema
 };
 const ordenTareasSchema = joi.array().items(ordenTareaSchema);
 
@@ -27,12 +27,12 @@ const crearOrdenSchema = {
   idProceso: idProcesoOrdenSchema.required(),
   numero: numeroOrdenSchema,
   finalizada: finalizadaOrdenSchema,
-  fechaInicia: fechaIniciaOrdenSchema
+  fechaIniciaProp: fechaOrdenSchema
 };
 
 const actualizarOrdenSchema = {
-  numero: numeroOrdenSchema,
   finalizada: finalizadaOrdenSchema,
+  tareas: ordenTareasSchema
 };
 
 module.exports = {
