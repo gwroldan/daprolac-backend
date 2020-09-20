@@ -4,6 +4,7 @@ const db = require('../config/mysql');
 const orden = require('../models/orden');
 const tarea = require('../models/tarea');
 const usuario = require('../models/usuario');
+const ordenDato = require('../models/orden-dato');
 
 const ordenTarea = db.define('orden_tarea', {
     idOrden: {
@@ -26,7 +27,6 @@ const ordenTarea = db.define('orden_tarea', {
     },
     idUsuario: {
         type: Sequilize.INTEGER,
-        allowNull: false,
         references: {
             model: usuario,
             key: 'id'
@@ -37,17 +37,14 @@ const ordenTarea = db.define('orden_tarea', {
         allowNull: false
     },
     fechaInicia: {
-        type: Sequilize.DATE,
-        allowNull: false
+        type: Sequilize.DATE
     },
     fechaFin: {
         type: Sequilize.DATE,
-        allowNull: false
     },
 });
 
-ordenTarea.belongsTo(orden, { as: 'orden', foreignKey: 'idOrden' });
-ordenTarea.belongsTo(tarea, { as: 'tarea', foreignKey: 'idTarea' });
 ordenTarea.belongsTo(usuario, { as: 'usuario', foreignKey: 'idUsuario' });
+ordenTarea.hasMany(ordenDato, { as: 'datos', foreignKey: 'idTarea', sourceKey: 'idTarea' });
 
 module.exports = ordenTarea;

@@ -20,8 +20,8 @@ const {
   actualizarDatoSchema,
 } = require('../utils/schemas/dato');
 const {
-  crearOrdenesSchema,
-  actualizarOrdenesSchema,
+  crearOrdenSchema,
+  actualizarOrdenSchema,
 } = require('../utils/schemas/orden');
 const validationHandler = require('../utils/middlewares/validation-handler');
 
@@ -98,12 +98,13 @@ module.exports = () => {
   router.get('/ordenes/:id', ordenesController.obtenerOrdenes);
   router.post(
     '/ordenes',
-    validationHandler(crearOrdenesSchema),
+    validationHandler(crearOrdenSchema),
+    ordenesController.setOrdenNumero,
     ordenesController.crearOrden
   );
   router.put(
     '/ordenes/:id',
-    validationHandler(actualizarOrdenesSchema),
+    validationHandler(actualizarOrdenSchema),
     ordenesController.actualizarOrden
   );
   router.delete('/ordenes/:id', ordenesController.eliminarOrden);

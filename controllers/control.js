@@ -44,15 +44,15 @@ exports.crear = async (req, res, next, model, objAsoc = {}, cbkAsoc = undefined)
 
     try {
         let resultado = await model.create(req.body,  { transaction: trans});
-        resultado = await model.findOne({
-            where: { id: resultado.id },
-            transaction: trans,
-            options: {
-              include: [{ all: true, nested: true }]
-            }
-          });
-
         if (!utils.isEmpty(objAsoc)) { await cbkAsoc(objAsoc, resultado.id, trans) }
+
+        resultado = await model.findOne({
+          where: { id: resultado.id },
+          transaction: trans,
+          options: {
+            include: [{ all: true, nested: true }]
+          }
+        });
 
         await trans.commit();
         response.success(req, res,201, resultado);

@@ -2,6 +2,7 @@ const Sequilize = require('sequelize');
 const db = require('../config/mysql');
 
 const proceso = require('../models/proceso');
+const ordenTarea = require('../models/orden-tarea');
 
 const orden = db.define('orden', {
     id: {
@@ -31,5 +32,6 @@ const orden = db.define('orden', {
 });
 
 orden.belongsTo(proceso, { as: 'proceso', foreignKey: 'idProceso' });
+orden.hasMany(ordenTarea, { as: 'tareas', foreignKey: 'idOrden' });
 
 module.exports = orden;

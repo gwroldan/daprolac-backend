@@ -1,36 +1,38 @@
-const joi = require('@hapi/joi');
+const joiBase = require('@hapi/joi');
+const joiDate = require('@hapi/joi-date');
+
+const joi = joiBase.extend(joiDate);
 
 const numeroOrdenSchema = joi.number().min(0);
 const finalizadaOrdenSchema = joi.boolean();
+const idProcesoOrdenSchema = joi.number();
+const fechaIniciaOrdenSchema = joi.date();
+
+const tareaDatoSchema = {
+  idDato: joi.number().required(),
+  valor: joi.string(),
+};
+const tareaDatosSchema = joi.array().items(tareaDatoSchema);
 
 const ordenTareaSchema = {
-  idUsuario: joi.number().required(),
+  idUsuario: joi.number(),
   fechaIniciaProp: joi.date(),
   fechaInicia: joi.date(),
   fechaFin: joi.date(),
+  tareaDatos: tareaDatosSchema
 };
-
-const ordenDatoSchema = {
-  idOrden: joi.number(),
-  idTarea: joi.number(),
-  idDato: joi.number(),
-  valor: joi.string(),
-};
+const ordenTareasSchema = joi.array().items(ordenTareaSchema);
 
 const crearOrdenSchema = {
-  numero: numeroOrdenSchema.required(),
-  finalizada: finalizadaOrdenSchema.required(),
-  idProceso: joi.number().required(),
-  tarea: ordenTareaSchema,
-  dato: ordenDatoSchema,
+  idProceso: idProcesoOrdenSchema.required(),
+  numero: numeroOrdenSchema,
+  finalizada: finalizadaOrdenSchema,
+  fechaInicia: fechaIniciaOrdenSchema
 };
 
 const actualizarOrdenSchema = {
-  numero: numeroOrdenSchema.required(),
-  finalizada: finalizadaOrdenSchema.required(),
-  idProceso: joi.number().required(),
-  tarea: ordenTareaSchema,
-  dato: ordenDatoSchema,
+  numero: numeroOrdenSchema,
+  finalizada: finalizadaOrdenSchema,
 };
 
 module.exports = {
