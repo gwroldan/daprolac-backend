@@ -49,9 +49,7 @@ exports.crear = async (req, res, next, model, objAsoc = {}, cbkAsoc = undefined)
         resultado = await model.findOne({
           where: { id: resultado.id },
           transaction: trans,
-          options: {
-            include: [{ all: true, nested: true }]
-          }
+          include: [{ all: true, nested: true }]
         });
 
         await trans.commit();
@@ -66,15 +64,21 @@ exports.actualizar = async (req, res, next, model, objAsoc = {}, cbkAsoc = undef
     const trans = await db.transaction();
 
     try {
-        const resultado = await model.findOne({ where: {id: req.params.id}, transaction: trans });
+        let resultado = await model.findOne({ where: {id: req.params.id}, transaction: trans });
 
         if (resultado) {
             await resultado.update(req.body, { transaction: trans });
             if (!utils.isEmpty(objAsoc)) { await cbkAsoc(objAsoc, req.params.id, trans) }
+
+          resultado = await model.findOne({
+            where: { id: resultado.id },
+            transaction: trans,
+            include: [{ all: true, nested: true }]
+          });
         }
 
         await trans.commit();
-        response.success(req, res,200, {id: req.params.id});
+        response.success(req, res,200, resultado);
     } catch (err) {
         await trans.rollback();
         next(err);
