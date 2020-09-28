@@ -6,15 +6,23 @@ const utils = require('../utils/utils');
 
 exports.login = async (req, res, next, model) => {
   const { email, clave } = req.body;
-  let auth = false;
+  let usuario = {
+    auth: false
+  };
 
   try {
     const resultado = await model.findOne({ where: { email } });
     if (resultado) {
-      auth = await bcrypt.compare(clave, resultado.clave);
+      usuario.auth = await bcrypt.compare(clave, resultado.clave);
+
+      if (usuario.auth) {
+        usuario.email = resultado.email;
+        usuario.nombre = resultado.nombre;
+        usuario.apellido = resultado.apellido;
+      }
     }
 
-    response.success(req, res, 200, { auth });
+    response.success(req, res, 200, usuario);
   } catch (err) {
     next(err);
   }
