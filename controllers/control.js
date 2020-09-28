@@ -16,6 +16,7 @@ exports.login = async (req, res, next, model) => {
       usuario.auth = await bcrypt.compare(clave, resultado.clave);
 
       if (usuario.auth) {
+        usuario.id = resultado.id;
         usuario.email = resultado.email;
         usuario.nombre = resultado.nombre;
         usuario.apellido = resultado.apellido;
