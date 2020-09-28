@@ -111,10 +111,12 @@ async function updateTareasOrden(objAsoc, idOrden, trans) {
     }
   });
 
-  await ordenTarea.bulkCreate(tareasOrden, {
-        transaction: trans,
-        updateOnDuplicate: camposActualiza
-      });
+  if (camposActualiza.length) {
+    await ordenTarea.bulkCreate(tareasOrden, {
+          transaction: trans,
+          updateOnDuplicate: camposActualiza
+        });
+  }
   await ordenDato.bulkCreate(datosOrden, {
         transaction: trans,
         updateOnDuplicate: ['valor']
