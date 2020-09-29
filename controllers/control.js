@@ -11,15 +11,16 @@ exports.login = async (req, res, next, model) => {
   };
 
   try {
-    const resultado = await model.findOne({ where: { email } });
+    const resultado = await model.findOne({
+      where: { email },
+      attributes: { include: ['clave'] }
+    });
     if (resultado) {
       usuario.auth = await bcrypt.compare(clave, resultado.clave);
 
       if (usuario.auth) {
-        usuario.id = resultado.id;
-        usuario.email = resultado.email;
-        usuario.nombre = resultado.nombre;
-        usuario.apellido = resultado.apellido;
+        usuario = { ...usuario, ...resultado.dataValues }
+        delete usuario.clave;
       }
     }
 
@@ -71,9 +72,14 @@ exports.crear = async (req, res, next, model, objAsoc = {}, cbkAsoc = undefined)
 
 exports.actualizar = async (req, res, next, model, objAsoc = {}, cbkAsoc = undefined) => {
     const trans = await db.transaction();
+    const objAttr = model.name === 'usuario' ? { include: ['clave'] } : {}
 
     try {
-        let resultado = await model.findOne({ where: {id: req.params.id}, transaction: trans });
+        let resultado = await model.findOne({
+          where: {id: req.params.id},
+          attributes: objAttr,
+          transaction: trans
+        });
 
         if (resultado) {
             await resultado.update(req.body, { transaction: trans });

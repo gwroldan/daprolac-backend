@@ -41,6 +41,9 @@ const usuario = db.define('usuario', {
         defaultValue: 0
     }
 }, {
+    defaultScope: {
+      attributes: { exclude: ['clave'] }
+    },
     hooks: {
         async beforeCreate(usuario) {
             try {
@@ -49,17 +52,18 @@ const usuario = db.define('usuario', {
                 throw response.customError('Error encriptando clave de usuario. ' + err.message(), 500);
             }
         },
-        async beforeUpdate(usuario) {
+        async beforeUpdate(usuario, options) {
             try {
+                console.log('OPCIONES:', options);
                 const cmp = await bcrypt.compare(usuario.clave, usuario._previousDataValues.clave);
-
+                console.log(usuario.dataValues.clave, usuario._previousDataValues.clave);
                 if (!cmp && usuario._previousDataValues.clave != usuario.dataValues.clave) {
                     usuario.clave = await getPasswordHash(usuario);
                 } else {
                     usuario.clave = usuario._previousDataValues.clave;
                 }
             } catch (err) {
-                throw response.customError('Error encriptando clave de usuario. ' + err.message(), 500);
+                throw response.customError('Error encriptando clave de usuario. ' + err.message, 500);
             }
         }
     }
