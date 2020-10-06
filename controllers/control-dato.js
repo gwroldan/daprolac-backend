@@ -33,20 +33,21 @@ async function setAsociacionesDato(objAsoc, idDato, trans) {
         objAsoc.opciones.forEach((item) => item.idDato = idDato);
         await datoOpcion.bulkCreate(objAsoc.opciones, { transaction: trans, updateOnDuplicate: ['valor'] });
     }
-    if (objAsoc.idTarea) {
-        objAsoc.idDato = idDato;
-    }
 
-    if (await existeDatoTarea(objAsoc.idTarea, objAsoc.idDato, trans)) {
+    if (objAsoc.idTarea) {
+      objAsoc.idDato = idDato;
+
+      if (await existeDatoTarea(objAsoc.idTarea, objAsoc.idDato, trans)) {
         return tareaDato.update(objAsoc, {
-            where: {
-                idTarea: objAsoc.idTarea,
-                idDato: objAsoc.idDato
-            },
-            transaction: trans
+          where: {
+            idTarea: objAsoc.idTarea,
+            idDato: objAsoc.idDato
+          },
+          transaction: trans
         });
-    } else {
+      } else {
         return tareaDato.create(objAsoc, { transaction: trans });
+      }
     }
 }
 
