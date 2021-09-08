@@ -32,7 +32,7 @@ const dato = db.define('dato', {
         type: Sequilize.DECIMAL(16, 4),
         allowNull: false,
         defaultValue: 0
-    }
+    },
 });
 
 dato.hasMany(datoOpcion, { as: 'opciones', foreignKey: 'idDato' });
