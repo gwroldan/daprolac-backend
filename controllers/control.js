@@ -4,12 +4,13 @@ const db = require('../config/mysql');
 const response = require('../utils/response');
 const utils = require('../utils/utils');
 
-const { sign } = require("jsonwebtoken");
+const { sign } = require('jsonwebtoken');
 
 exports.login = async (req, res, next, model) => {
   const { email, clave } = req.body;
   let usuario = {
-    auth: false
+    auth: false,
+    token: null
   };
 
   try {
@@ -19,16 +20,18 @@ exports.login = async (req, res, next, model) => {
     });
     if (resultado) {
       usuario.auth = await bcrypt.compare(clave, resultado.clave);
+      usuario.tipo = resultado.dataValues.tipo;
 
       if (usuario.auth) {
-        usuario = { ...usuario, ...resultado.dataValues }
-        const accessToken = sign(
+        const token = sign(
           { email: usuario.email, id: usuario.id },
-          "importantsecret",{expiresIn:1600}
+          "importantsecret",
+          { expiresIn: 1600 }
         );
-        //res.json(accessToken);
-        return res.status(200).send({ user: usuario, accessToken});
-        //delete usuario.clave;
+        usuario.token = token;
+
+        usuario = { ...usuario, ...resultado.dataValues }
+        delete usuario.clave;
       }
     }
 
