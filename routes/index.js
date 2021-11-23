@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+//const authMiddleware =require('../utils/middlewares/authMiddleware');
 // importo los schemas
 const {
   crearUsuarioSchema,
@@ -33,11 +34,12 @@ const datosController = require('../controllers/control-dato');
 const ordenesController = require('../controllers/control-orden');
 
 module.exports = () => {
-  router.get('/usuarios', usuariosController.obtenerUsuarios);
+  router.get('/usuarios',usuariosController.obtenerUsuarios);
   router.get('/usuarios/:id', usuariosController.obtenerUsuarios);
   router.post(
     '/usuarios',
     validationHandler(crearUsuarioSchema),
+    //authMiddleware,
     usuariosController.crearUsuario
   );
   router.post(

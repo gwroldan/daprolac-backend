@@ -22,7 +22,7 @@ const datoOpcion = db.define('dato_opcion', {
     valor: {
         type: Sequilize.STRING(100),
         allowNull: false
-    }
+    },
 });
 
 module.exports = datoOpcion;

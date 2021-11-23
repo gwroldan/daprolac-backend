@@ -4,6 +4,8 @@ const db = require('../config/mysql');
 const response = require('../utils/response');
 const utils = require('../utils/utils');
 
+const { sign } = require("jsonwebtoken");
+
 exports.login = async (req, res, next, model) => {
   const { email, clave } = req.body;
   let usuario = {
@@ -20,7 +22,13 @@ exports.login = async (req, res, next, model) => {
 
       if (usuario.auth) {
         usuario = { ...usuario, ...resultado.dataValues }
-        delete usuario.clave;
+        const accessToken = sign(
+          { email: usuario.email, id: usuario.id },
+          "importantsecret",{expiresIn:1600}
+        );
+        //res.json(accessToken);
+        return res.status(200).send({ user: usuario, accessToken});
+        //delete usuario.clave;
       }
     }
 
