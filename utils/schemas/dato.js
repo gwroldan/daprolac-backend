@@ -9,6 +9,7 @@ const nombreDatoSchema = joi.string().trim().max(60);
 const unidadMedidaDatoSchema = joi.string().trim().max(40);
 const tipoDatoSchema = joi.string().trim().valid('numero', 'cadena', 'opcion');
 const minMaxDatoSchema = joi.number().min(0);
+const accionCorrectivaDatoSchema = joi.string().trim().max(255);
 const valorOpcionDatoSchema = joi.object().keys({
     valor: joi.string().trim().max(100),
     id: joi.number()
@@ -31,6 +32,7 @@ const crearDatoSchema = {
     tipo: tipoDatoSchema.required(),
     minimo: rangoDatoSchema,
     maximo: rangoDatoSchema,
+    accionCorrectiva: accionCorrectivaDatoSchema,
     opciones: opcionesDatoSchema,
     tarea: tareaAsocDatoSchema
 }
@@ -41,6 +43,7 @@ const actualizarDatoSchema = {
     tipo: tipoDatoSchema,
     minimo: minMaxDatoSchema,
     maximo: minMaxDatoSchema,
+    accionCorrectiva: accionCorrectivaDatoSchema,
     opciones: valoresOpcionDatoSchema,
     tarea: tareaAsocDatoSchema
 }

@@ -33,6 +33,11 @@ const dato = db.define('dato', {
         allowNull: false,
         defaultValue: 0
     },
+    accionCorrectiva: {
+      type: Sequilize.STRING,
+      allowNull: true,
+      defaultValue: null
+    }
 });
 
 dato.hasMany(datoOpcion, { as: 'opciones', foreignKey: 'idDato' });
