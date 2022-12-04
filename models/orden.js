@@ -35,6 +35,6 @@ const orden = db.define('orden', {
 orden.belongsTo(proceso, { as: 'proceso', foreignKey: 'idProceso' });
 orden.hasMany(ordenTarea, { as: 'tareas', foreignKey: 'idOrden' });
 
-// ordenDato.belongsTo(orden, { as: 'orden', foreignKey: 'idOrden' });
+ordenDato.belongsTo(orden, { as: 'orden', foreignKey: 'idOrden' });
 
 module.exports = orden;
