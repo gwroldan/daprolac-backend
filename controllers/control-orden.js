@@ -71,6 +71,7 @@ async function createTareasOrden(objAsoc, idOrden, trans) {
 
   tareasOrden = await ordenTarea.bulkCreate(tareasOrden, { transaction: trans, validate: true });
   tareasOrden.forEach(tareaOrden => {
+    console.log(tareaOrden);
     datosOrden.forEach(datoOrden => {
       if (tareaOrden.idOrden === datoOrden.idOrden && tareaOrden.idTarea === datoOrden.idTarea) {
         datoOrden.idOrdenTarea = tareaOrden.id;
