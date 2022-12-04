@@ -7,9 +7,15 @@ const usuario = require('../models/usuario');
 const ordenDato = require('../models/orden-dato');
 
 const ordenTarea = db.define('orden_tarea', {
-    idOrden: {
+    id: {
         type: Sequilize.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
+        unique: true,
+        allowNull: false,
+    },
+    idOrden: {
+        type: Sequilize.INTEGER,
         allowNull: false,
         references: {
             model: orden,
@@ -18,7 +24,6 @@ const ordenTarea = db.define('orden_tarea', {
     },
     idTarea: {
         type: Sequilize.INTEGER,
-        primaryKey: true,
         allowNull: false,
         references: {
             model: tarea,
@@ -45,6 +50,8 @@ const ordenTarea = db.define('orden_tarea', {
 });
 
 ordenTarea.belongsTo(usuario, { as: 'usuario', foreignKey: 'idUsuario' });
-ordenTarea.hasMany(ordenDato, { as: 'datos', foreignKey: 'idTarea', sourceKey: 'idTarea' });
+ordenTarea.hasMany(ordenDato, { as: 'datos' , foreignKey: 'idOrdenTarea', sourceKey: 'id'});
+
+ordenDato.belongsTo(ordenTarea, { as: 'tarea', foreignKey: 'idOrdenTarea' });
 
 module.exports = ordenTarea;

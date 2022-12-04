@@ -3,6 +3,7 @@ const db = require('../config/mysql');
 
 const proceso = require('../models/proceso');
 const ordenTarea = require('../models/orden-tarea');
+const ordenDato = require("./orden-dato");
 
 const orden = db.define('orden', {
     id: {
@@ -33,5 +34,7 @@ const orden = db.define('orden', {
 
 orden.belongsTo(proceso, { as: 'proceso', foreignKey: 'idProceso' });
 orden.hasMany(ordenTarea, { as: 'tareas', foreignKey: 'idOrden' });
+
+ordenDato.belongsTo(orden, { as: 'orden', foreignKey: 'idOrden' });
 
 module.exports = orden;

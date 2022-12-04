@@ -38,7 +38,7 @@ async function createTareasOrden(objAsoc, idOrden, trans) {
     throw response.customError('El proceso seleccionado no cuenta con tareas asociadas.', 409);
   }
 
-  const tareasOrden = [];
+  let tareasOrden = [];
   const datosOrden = [];
 
   let fechaIniciaProp = DateTime.fromMillis(objAsoc.fechaIniciaProp);
@@ -69,7 +69,15 @@ async function createTareasOrden(objAsoc, idOrden, trans) {
     });
   });
 
-  await ordenTarea.bulkCreate(tareasOrden, { transaction: trans, validate: true });
+  tareasOrden = await ordenTarea.bulkCreate(tareasOrden, { transaction: trans, validate: true });
+  tareasOrden.forEach(tareaOrden => {
+    datosOrden.forEach(datoOrden => {
+      if (tareaOrden.idOrden === datoOrden.idOrden && tareaOrden.idTarea === datoOrden.idTarea) {
+        datoOrden.idOrdenTarea = tareaOrden.id;
+      }
+    })
+  })
+
   await ordenDato.bulkCreate(datosOrden, { transaction: trans, validate: true });
 }
 
