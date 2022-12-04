@@ -96,9 +96,17 @@ async function updateTareasOrden(objAsoc, idOrden, trans) {
   const datosOrden = [];
   const camposActualiza = []
 
-  objAsoc.tareas.forEach( tarea => {
+  const tareasOrdenFound = await ordenTarea.findAll({
+    where: { idOrden: +idOrden },
+    transaction: trans
+  });
+
+  objAsoc.tareas.forEach(tarea => {
+    const tareaOrden = tareasOrdenFound.find(value => value.idOrden === +idOrden && value.idTarea === tarea.idTarea);
+
     const t = {
-      idOrden: idOrden,
+      id: tareaOrden.id,
+      idOrden: +idOrden,
       idTarea: tarea.idTarea,
     };
     if (tarea.fechaInicia) {
