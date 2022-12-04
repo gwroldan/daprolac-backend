@@ -70,8 +70,9 @@ async function createTareasOrden(objAsoc, idOrden, trans) {
     });
   });
 
+  // tareasOrden = await ordenTarea.bulkCreate(tareasOrden, { transaction: trans, validate: true });
   await ordenTarea.bulkCreate(tareasOrden, { transaction: trans, validate: true });
-
+  // Debo realizar el Find porque el bulkCreate no trae correctamente el autocrimental si es diferente de 1.
   const tareaOrdenFind = tareasOrden.map(to => { return { idOrden: to.idOrden, idTarea: to.idTarea }});
   tareasOrden = await ordenTarea.findAll({
     where: { [Op.or]: tareaOrdenFind },
