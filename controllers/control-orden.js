@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const { DateTime } = require('luxon');
 const control = require('./control');
 
@@ -69,7 +70,14 @@ async function createTareasOrden(objAsoc, idOrden, trans) {
     });
   });
 
-  tareasOrden = await ordenTarea.bulkCreate(tareasOrden, { transaction: trans, validate: true });
+  await ordenTarea.bulkCreate(tareasOrden, { transaction: trans, validate: true });
+
+  const tareaOrdenFind = tareasOrden.map(to => { return { idOrden: to.idOrden, idTarea: to.idTarea }});
+  tareasOrden = await ordenTarea.findAll({
+    where: { [Op.or]: tareaOrdenFind },
+    transaction: trans
+  });
+
   tareasOrden.forEach(tareaOrden => {
     console.log(tareaOrden);
     datosOrden.forEach(datoOrden => {
